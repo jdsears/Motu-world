@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './App.css';
 
 // ============================================
@@ -553,12 +553,267 @@ const DebugPanel = ({ logs, isOpen, onToggle, onClear, apiKeyStatus, dataSource 
   );
 };
 
+// View Switcher Component
+const ViewSwitcher = ({ currentView, setCurrentView, hasVideos }) => {
+  return (
+    <div className="view-switcher">
+      <button
+        className={`view-btn ${currentView === 'gallery' ? 'active' : ''}`}
+        onClick={() => setCurrentView('gallery')}
+        title="Gallery View"
+      >
+        <span className="view-icon">▦</span>
+        <span className="view-label">Gallery</span>
+      </button>
+      <button
+        className={`view-btn ${currentView === 'tunnel' ? 'active' : ''}`}
+        onClick={() => setCurrentView('tunnel')}
+        title="Tunnel View"
+      >
+        <span className="view-icon">◎</span>
+        <span className="view-label">Tunnel</span>
+      </button>
+      {hasVideos && (
+        <button
+          className={`view-btn ${currentView === 'map' ? 'active' : ''}`}
+          onClick={() => setCurrentView('map')}
+          title="Map View (Videos)"
+        >
+          <span className="view-icon">◐</span>
+          <span className="view-label">Map</span>
+        </button>
+      )}
+    </div>
+  );
+};
+
+// Tunnel View Component - 3D scrolling experience
+const TunnelView = ({ nfts, onSelect }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoPlay, setIsAutoPlay] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!isAutoPlay) return;
+    const interval = setInterval(() => {
+      setCurrentIndex(i => (i + 1) % nfts.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [isAutoPlay, nfts.length]);
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        setCurrentIndex(i => Math.min(nfts.length - 1, i + 1));
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        setCurrentIndex(i => Math.max(0, i - 1));
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [nfts.length]);
+
+  const handleWheel = (e) => {
+    e.preventDefault();
+    if (e.deltaY > 0) {
+      setCurrentIndex(i => Math.min(nfts.length - 1, i + 1));
+    } else {
+      setCurrentIndex(i => Math.max(0, i - 1));
+    }
+  };
+
+  const currentNft = nfts[currentIndex];
+  const dayNumber = getDayNumber(currentNft?.date);
+
+  return (
+    <div className="tunnel-view" ref={containerRef} onWheel={handleWheel}>
+      <div className="tunnel-controls">
+        <button
+          className={`tunnel-autoplay ${isAutoPlay ? 'active' : ''}`}
+          onClick={() => setIsAutoPlay(!isAutoPlay)}
+        >
+          {isAutoPlay ? '⏸ Pause' : '▶ Auto'}
+        </button>
+        <span className="tunnel-counter">{currentIndex + 1} / {nfts.length}</span>
+      </div>
+
+      <div className="tunnel-stage">
+        {/* Previous items (fading into distance) */}
+        {[-3, -2, -1].map(offset => {
+          const idx = currentIndex + offset;
+          if (idx < 0) return null;
+          const nft = nfts[idx];
+          return (
+            <div
+              key={nft.id}
+              className="tunnel-item"
+              style={{
+                transform: `translateZ(${offset * 200}px) scale(${1 + offset * 0.15})`,
+                opacity: 0.3 + (offset + 3) * 0.2,
+                zIndex: offset
+              }}
+            >
+              {nft.image && <img src={nft.image} alt={nft.name} />}
+            </div>
+          );
+        })}
+
+        {/* Current item */}
+        <div
+          className="tunnel-item current"
+          onClick={() => onSelect(currentIndex)}
+        >
+          {currentNft?.animationUrl ? (
+            <video src={currentNft.animationUrl} autoPlay muted loop playsInline />
+          ) : currentNft?.image ? (
+            <img src={currentNft.image} alt={currentNft.name} />
+          ) : (
+            <div className="tunnel-placeholder">Day {dayNumber}</div>
+          )}
+        </div>
+
+        {/* Next items (coming from distance) */}
+        {[1, 2, 3].map(offset => {
+          const idx = currentIndex + offset;
+          if (idx >= nfts.length) return null;
+          const nft = nfts[idx];
+          return (
+            <div
+              key={nft.id}
+              className="tunnel-item"
+              style={{
+                transform: `translateZ(${offset * -200}px) scale(${1 - offset * 0.15})`,
+                opacity: 0.7 - offset * 0.2,
+                zIndex: -offset
+              }}
+            >
+              {nft.image && <img src={nft.image} alt={nft.name} />}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="tunnel-info">
+        <div className="tunnel-day">Day {dayNumber}/366</div>
+        <div className="tunnel-date">{currentNft?.date}</div>
+        <div className="tunnel-location">{currentNft?.location}</div>
+      </div>
+
+      <div className="tunnel-nav">
+        <button
+          onClick={() => setCurrentIndex(i => Math.max(0, i - 1))}
+          disabled={currentIndex === 0}
+        >
+          ←
+        </button>
+        <button
+          onClick={() => setCurrentIndex(i => Math.min(nfts.length - 1, i + 1))}
+          disabled={currentIndex === nfts.length - 1}
+        >
+          →
+        </button>
+      </div>
+
+      <div className="tunnel-hint">Use arrow keys or scroll to navigate • Click to view details</div>
+    </div>
+  );
+};
+
+// Map View Component - World map with video locations
+const MapView = ({ nfts, onSelect }) => {
+  // Filter to only videos with valid locations
+  const videoNfts = nfts.filter(n => n.type === 'video' && n.location && n.location !== 'Unknown Location');
+
+  // Group by continent for stats
+  const continentCounts = videoNfts.reduce((acc, nft) => {
+    acc[nft.continent] = (acc[nft.continent] || 0) + 1;
+    return acc;
+  }, {});
+
+  return (
+    <div className="map-view">
+      <div className="map-header">
+        <h2>Video Moments Around the World</h2>
+        <p>{videoNfts.length} videos captured across {Object.keys(continentCounts).length} continents</p>
+      </div>
+
+      <div className="map-container">
+        <svg viewBox="0 0 1000 500" className="world-map">
+          {/* Simplified world map paths */}
+          <path className="continent" d="M150,120 Q200,100 250,120 L280,180 Q250,220 200,200 L150,160 Z" /> {/* North America */}
+          <path className="continent" d="M200,250 Q230,240 260,260 L270,350 Q240,380 210,360 L190,300 Z" /> {/* South America */}
+          <path className="continent" d="M420,100 Q500,80 580,100 L600,200 Q550,240 480,220 L420,160 Z" /> {/* Europe */}
+          <path className="continent" d="M450,220 Q520,200 600,230 L620,380 Q560,420 480,400 L440,300 Z" /> {/* Africa */}
+          <path className="continent" d="M620,100 Q720,80 820,120 L850,280 Q780,320 680,280 L620,180 Z" /> {/* Asia */}
+          <path className="continent" d="M750,350 Q800,330 850,350 L860,420 Q820,450 770,430 L750,380 Z" /> {/* Oceania */}
+          <path className="continent" d="M350,450 Q450,440 550,460 L560,480 Q450,490 350,480 Z" /> {/* Antarctica */}
+        </svg>
+
+        {/* Continent labels with counts */}
+        <div className="map-markers">
+          {Object.entries({
+            'North America': { x: 20, y: 25 },
+            'South America': { x: 25, y: 55 },
+            'Europe': { x: 48, y: 22 },
+            'Africa': { x: 50, y: 45 },
+            'Asia': { x: 70, y: 25 },
+            'Oceania': { x: 80, y: 70 }
+          }).map(([continent, pos]) => (
+            continentCounts[continent] && (
+              <div
+                key={continent}
+                className="map-marker"
+                style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+              >
+                <span className="marker-count">{continentCounts[continent]}</span>
+                <span className="marker-label">{continent}</span>
+              </div>
+            )
+          ))}
+        </div>
+      </div>
+
+      {/* Video list by continent */}
+      <div className="map-video-list">
+        {Object.entries(continentCounts).sort((a, b) => b[1] - a[1]).map(([continent, count]) => (
+          <div key={continent} className="continent-section">
+            <h3>{continent} <span>({count} videos)</span></h3>
+            <div className="continent-videos">
+              {videoNfts
+                .filter(n => n.continent === continent)
+                .map((nft, idx) => (
+                  <div
+                    key={nft.id}
+                    className="map-video-card"
+                    onClick={() => onSelect(nfts.findIndex(n => n.id === nft.id))}
+                  >
+                    {nft.image ? (
+                      <img src={nft.image} alt={nft.name} />
+                    ) : (
+                      <div className="video-placeholder">▶</div>
+                    )}
+                    <div className="video-info">
+                      <span className="video-date">{nft.date}</span>
+                      <span className="video-location">{nft.location}</span>
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // Main App Component
 function App() {
   const [nfts, setNfts] = useState(SAMPLE_NFTS);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [activeFilter, setActiveFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all'); // 'all', 'video', 'polaroid'
+  const [currentView, setCurrentView] = useState('gallery'); // 'gallery', 'tunnel', 'map'
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [dataSource, setDataSource] = useState('placeholder');
@@ -766,19 +1021,28 @@ function App() {
         </div>
       </section>
 
-      {/* Filter Bar */}
-      <FilterBar 
-        continents={continents}
-        activeFilter={activeFilter}
-        setActiveFilter={setActiveFilter}
-        typeFilter={typeFilter}
-        setTypeFilter={setTypeFilter}
-        totalCount={sortedNFTs.length}
+      {/* View Switcher */}
+      <ViewSwitcher
+        currentView={currentView}
+        setCurrentView={setCurrentView}
         hasVideos={hasVideos}
-        hasPolaroids={hasPolaroids}
       />
 
-      {/* Gallery Grid */}
+      {/* Filter Bar - only show for gallery view */}
+      {currentView === 'gallery' && (
+        <FilterBar
+          continents={continents}
+          activeFilter={activeFilter}
+          setActiveFilter={setActiveFilter}
+          typeFilter={typeFilter}
+          setTypeFilter={setTypeFilter}
+          totalCount={sortedNFTs.length}
+          hasVideos={hasVideos}
+          hasPolaroids={hasPolaroids}
+        />
+      )}
+
+      {/* Main Content */}
       <main className="gallery">
         {loading ? (
           <div className="loading">
@@ -789,7 +1053,7 @@ function App() {
           <div className="error">
             <p>{error}</p>
           </div>
-        ) : (
+        ) : currentView === 'gallery' ? (
           <div className="gallery-grid">
             {sortedNFTs.map((nft, index) => (
               <NFTCard
@@ -800,7 +1064,17 @@ function App() {
               />
             ))}
           </div>
-        )}
+        ) : currentView === 'tunnel' ? (
+          <TunnelView
+            nfts={sortedNFTs}
+            onSelect={(index) => setSelectedIndex(index)}
+          />
+        ) : currentView === 'map' ? (
+          <MapView
+            nfts={sortedNFTs}
+            onSelect={(index) => setSelectedIndex(index)}
+          />
+        ) : null}
       </main>
 
       {/* Modal */}
