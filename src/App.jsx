@@ -22,56 +22,34 @@ const CONFIG = {
 // Get your free API key at: https://www.alchemy.com/
 // Set VITE_ALCHEMY_API_KEY in your .env file
 // ============================================
-async function fetchNFTsFromAlchemy(walletAddress, contractAddress, apiKey, addLog) {
-  const logPrefix = `[Alchemy:${contractAddress.slice(0, 8)}...]`;
+async function fetchNFTsFromAlchemy(walletAddress, contractAddress, apiKey) {
   const baseUrl = `https://eth-mainnet.g.alchemy.com/nft/v3/${apiKey || 'demo'}/getNFTsForOwner`;
   let allNfts = [];
   let pageKey = null;
-  let pageCount = 0;
-
-  addLog?.(`${logPrefix} Starting fetch for contract ${contractAddress}`);
-  addLog?.(`${logPrefix} Wallet: ${walletAddress}`);
-  addLog?.(`${logPrefix} API Key present: ${apiKey ? 'YES (' + apiKey.slice(0, 4) + '...)' : 'NO'}`);
 
   try {
-    // Paginate through all results
     do {
-      pageCount++;
       let url = `${baseUrl}?owner=${walletAddress}&contractAddresses[]=${contractAddress}&withMetadata=true&pageSize=100`;
       if (pageKey) {
         url += `&pageKey=${pageKey}`;
       }
 
-      addLog?.(`${logPrefix} Fetching page ${pageCount}...`);
-      console.log(`${logPrefix} Fetching:`, url.replace(apiKey, 'API_KEY_HIDDEN'));
-
       const response = await fetch(url);
-
-      addLog?.(`${logPrefix} Response status: ${response.status} ${response.statusText}`);
-      console.log(`${logPrefix} Response:`, response.status, response.statusText);
 
       if (!response.ok) {
         const errorText = await response.text();
-        addLog?.(`${logPrefix} ERROR: ${errorText.slice(0, 200)}`);
-        console.error(`${logPrefix} Error response body:`, errorText);
         throw new Error(`HTTP ${response.status}: ${errorText.slice(0, 100)}`);
       }
 
       const data = await response.json();
-      const nftsInPage = data.ownedNfts?.length || 0;
-      addLog?.(`${logPrefix} Page ${pageCount}: Got ${nftsInPage} NFTs`);
-      console.log(`${logPrefix} Page ${pageCount} data:`, { nftsInPage, hasMore: !!data.pageKey });
-
       allNfts = [...allNfts, ...(data.ownedNfts || [])];
       pageKey = data.pageKey || null;
     } while (pageKey);
 
-    addLog?.(`${logPrefix} DONE: Total ${allNfts.length} NFTs fetched`);
     return allNfts;
   } catch (error) {
-    addLog?.(`${logPrefix} FETCH ERROR: ${error.message}`);
-    console.error(`${logPrefix} Error fetching from Alchemy:`, error);
-    return allNfts; // Return what we have so far
+    console.error('Error fetching from Alchemy:', error);
+    return allNfts;
   }
 }
 
@@ -488,74 +466,6 @@ const FilterBar = ({ continents, activeFilter, setActiveFilter, typeFilter, setT
   );
 };
 
-// Debug Panel Component
-const DebugPanel = ({ logs, isOpen, onToggle, onClear, apiKeyStatus, dataSource }) => {
-  if (!isOpen) {
-    return (
-      <button
-        onClick={onToggle}
-        style={{
-          position: 'fixed',
-          bottom: '10px',
-          right: '10px',
-          zIndex: 9999,
-          padding: '8px 12px',
-          background: apiKeyStatus === 'found' ? '#2a5a2a' : '#5a2a2a',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          fontFamily: 'monospace',
-          fontSize: '12px'
-        }}
-      >
-        API: {apiKeyStatus} | Source: {dataSource} | Show Debug
-      </button>
-    );
-  }
-
-  return (
-    <div style={{
-      position: 'fixed',
-      bottom: '10px',
-      right: '10px',
-      width: '500px',
-      maxHeight: '400px',
-      background: 'rgba(0,0,0,0.95)',
-      color: '#0f0',
-      padding: '10px',
-      borderRadius: '8px',
-      fontFamily: 'monospace',
-      fontSize: '11px',
-      zIndex: 9999,
-      border: '1px solid #333'
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-        <strong>Debug Log (API: {apiKeyStatus} | Source: {dataSource})</strong>
-        <div>
-          <button onClick={onClear} style={{ marginRight: '5px', cursor: 'pointer' }}>Clear</button>
-          <button onClick={onToggle} style={{ cursor: 'pointer' }}>Close</button>
-        </div>
-      </div>
-      <div style={{ maxHeight: '340px', overflowY: 'auto' }}>
-        {logs.length === 0 ? (
-          <div style={{ color: '#666' }}>No logs yet. Click Refresh to load NFTs.</div>
-        ) : (
-          logs.map((log, i) => (
-            <div key={i} style={{
-              borderBottom: '1px solid #222',
-              padding: '2px 0',
-              color: log.msg.includes('ERROR') ? '#f55' : log.msg.includes('SUCCESS') || log.msg.includes('DONE') ? '#5f5' : '#0f0'
-            }}>
-              <span style={{ color: '#666' }}>[{log.time}]</span> {log.msg}
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
-};
-
 // Main App Component
 function App() {
   const [nfts, setNfts] = useState(SAMPLE_NFTS);
@@ -566,31 +476,13 @@ function App() {
   const [error, setError] = useState(null);
   const [dataSource, setDataSource] = useState('placeholder');
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [debugLogs, setDebugLogs] = useState([]);
-  const [debugOpen, setDebugOpen] = useState(false);
 
-  // Add a log entry
-  const addLog = useCallback((msg) => {
-    const time = new Date().toLocaleTimeString();
-    console.log(`[DEBUG ${time}]`, msg);
-    setDebugLogs(prev => [...prev, { time, msg }]);
-  }, []);
-
-  // Check API key status
+  // API key
   const apiKey = import.meta.env.VITE_ALCHEMY_API_KEY;
-  const apiKeyStatus = apiKey ? 'found' : 'missing';
 
-  // Reusable function to load NFTs
+  // Load NFTs from API
   const loadNFTs = useCallback(async () => {
-    setDebugLogs([]); // Clear previous logs
-    addLog('=== Starting NFT Load ===');
-    addLog(`Environment: ${import.meta.env.MODE}`);
-    addLog(`API Key Status: ${apiKey ? 'FOUND (' + apiKey.slice(0, 4) + '...' + apiKey.slice(-4) + ')' : 'NOT FOUND'}`);
-    addLog(`All env vars: ${JSON.stringify(Object.keys(import.meta.env))}`);
-
     if (!apiKey) {
-      addLog('ERROR: No Alchemy API key found!');
-      addLog('Make sure VITE_ALCHEMY_API_KEY is set in Railway environment variables');
       console.log('No Alchemy API key found. Using placeholder data.');
       setDataSource('placeholder');
       return;
@@ -598,29 +490,23 @@ function App() {
 
     setLoading(true);
     setError(null);
-    addLog('Loading started...');
 
     try {
       // Fetch video moments (ERC-721)
-      addLog('--- Fetching Video Moments (ERC-721) ---');
       const videoNFTs = await fetchNFTsFromAlchemy(
         CONFIG.walletAddress,
         CONFIG.contracts.videos,
-        apiKey,
-        addLog
+        apiKey
       );
 
       // Fetch polaroids (ERC-1155)
-      addLog('--- Fetching Polaroids (ERC-1155) ---');
       const polaroidNFTs = await fetchNFTsFromAlchemy(
         CONFIG.walletAddress,
         CONFIG.contracts.polaroids,
-        apiKey,
-        addLog
+        apiKey
       );
 
       // Transform and combine
-      addLog(`Transforming: ${videoNFTs.length} videos, ${polaroidNFTs.length} polaroids`);
       const transformedVideos = videoNFTs.map(nft => transformAlchemyNFT(nft, 'video'));
       const transformedPolaroids = polaroidNFTs.map(nft => transformAlchemyNFT(nft, 'polaroid'));
 
@@ -630,23 +516,19 @@ function App() {
         setNfts(allNFTs);
         setDataSource('api');
         setLastUpdated(new Date());
-        addLog(`SUCCESS: Loaded ${allNFTs.length} total NFTs`);
         console.log(`Loaded ${transformedVideos.length} videos and ${transformedPolaroids.length} polaroids`);
       } else {
-        addLog('WARNING: No NFTs found for this wallet');
         console.log('No NFTs found for this wallet. Using placeholder data.');
         setDataSource('placeholder');
       }
     } catch (err) {
-      addLog(`FATAL ERROR: ${err.message}`);
       console.error('Error loading NFTs:', err);
       setError('Failed to load NFTs. Showing placeholder data.');
       setDataSource('placeholder');
     } finally {
       setLoading(false);
-      addLog('=== Load Complete ===');
     }
-  }, [apiKey, addLog]);
+  }, [apiKey]);
 
   // Fetch NFTs from API on mount
   useEffect(() => {
@@ -845,15 +727,6 @@ function App() {
         </div>
       </footer>
 
-      {/* Debug Panel */}
-      <DebugPanel
-        logs={debugLogs}
-        isOpen={debugOpen}
-        onToggle={() => setDebugOpen(!debugOpen)}
-        onClear={() => setDebugLogs([])}
-        apiKeyStatus={apiKeyStatus}
-        dataSource={dataSource}
-      />
     </div>
   );
 }
