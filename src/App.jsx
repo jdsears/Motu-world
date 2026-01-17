@@ -183,11 +183,10 @@ const getDayNumber = (dateStr) => {
   const month = months[parts[0]];
   const day = parseInt(parts[1]);
 
-  // Calculate day of year (0-indexed from Jan 1)
+  // Use UTC to avoid DST issues affecting day calculation
   // April 8, 2024 = day index 98 (Jan has 31, Feb has 29, Mar has 31, Apr 1-7 = 7)
-  // 31 + 29 + 31 + 7 = 98 days before April 8
-  const date = new Date(2024, month, day);
-  const yearStart = new Date(2024, 0, 1);
+  const date = Date.UTC(2024, month, day);
+  const yearStart = Date.UTC(2024, 0, 1);
   const dayIndex = Math.floor((date - yearStart) / (1000 * 60 * 60 * 24));
 
   // April 8 has dayIndex 98, should be MOTU Day 1
