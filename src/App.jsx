@@ -183,14 +183,15 @@ const getDayNumber = (dateStr) => {
   const month = months[parts[0]];
   const day = parseInt(parts[1]);
 
-  // Calculate day of year (1-366 for leap year)
+  // Calculate day of year (0-indexed from Jan 1)
+  // April 8, 2024 = day index 98 (Jan has 31, Feb has 29, Mar has 31, Apr 1-7 = 7)
+  // 31 + 29 + 31 + 7 = 98 days before April 8
   const date = new Date(2024, month, day);
   const yearStart = new Date(2024, 0, 1);
-  const dayOfYear = Math.floor((date - yearStart) / (1000 * 60 * 60 * 24)) + 1;
+  const dayIndex = Math.floor((date - yearStart) / (1000 * 60 * 60 * 24));
 
-  // April 8 is day 99 of the year, which should be Day 1 of MOTU
-  // Offset by 98 so April 8 (day 99) becomes Day 1
-  let motuDay = dayOfYear - 98;
+  // April 8 has dayIndex 98, should be MOTU Day 1
+  let motuDay = dayIndex - 97;
 
   // Wrap around: Jan 1-Apr 7 become days 269-366
   if (motuDay <= 0) {
