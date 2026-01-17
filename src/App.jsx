@@ -172,6 +172,7 @@ const PLACEHOLDER_NFTS = [
 const SAMPLE_NFTS = PLACEHOLDER_NFTS;
 
 // Generate day number from date string
+// MOTU collection starts April 8 = Day 1, ends April 7 = Day 366
 const getDayNumber = (dateStr) => {
   const months = {
     'January': 0, 'February': 1, 'March': 2, 'April': 3,
@@ -181,10 +182,22 @@ const getDayNumber = (dateStr) => {
   const parts = dateStr.split(' ');
   const month = months[parts[0]];
   const day = parseInt(parts[1]);
+
+  // Calculate day of year (1-366 for leap year)
   const date = new Date(2024, month, day);
-  const start = new Date(2024, 0, 1);
-  const diff = date - start;
-  return Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
+  const yearStart = new Date(2024, 0, 1);
+  const dayOfYear = Math.floor((date - yearStart) / (1000 * 60 * 60 * 24)) + 1;
+
+  // April 8 is day 99 of the year, which should be Day 1 of MOTU
+  // Offset by 98 so April 8 (day 99) becomes Day 1
+  let motuDay = dayOfYear - 98;
+
+  // Wrap around: Jan 1-Apr 7 become days 269-366
+  if (motuDay <= 0) {
+    motuDay += 366;
+  }
+
+  return motuDay;
 };
 
 // NFT Card Component
@@ -192,9 +205,18 @@ const NFTCard = ({ nft, onClick, index }) => {
   const dayNumber = getDayNumber(nft.date);
   const isVideo = nft.type === 'video';
   const hasMedia = nft.animationUrl || nft.image;
-  
+
+  // Handle video autoplay
+  const handleVideoRef = (video) => {
+    if (video) {
+      video.play().catch(() => {
+        // Autoplay blocked - will play on hover instead
+      });
+    }
+  };
+
   return (
-    <div 
+    <div
       className="nft-card"
       onClick={() => onClick(nft)}
       style={{ animationDelay: `${index * 0.1}s` }}
@@ -212,11 +234,13 @@ const NFTCard = ({ nft, onClick, index }) => {
           {hasMedia ? (
             <div className="nft-preview">
               {nft.animationUrl ? (
-                <video 
-                  src={nft.animationUrl} 
-                  muted 
-                  loop 
+                <video
+                  ref={handleVideoRef}
+                  src={nft.animationUrl}
+                  muted
+                  loop
                   playsInline
+                  autoPlay
                   onMouseEnter={(e) => e.target.play()}
                   onMouseLeave={(e) => { e.target.pause(); e.target.currentTime = 0; }}
                 />
