@@ -84,27 +84,27 @@ function transformAlchemyNFT(nft, type = 'video') {
   const dateMatch = name.match(/^(\w+)\s+(\d+)/);
   const date = dateMatch ? `${dateMatch[1]} ${dateMatch[2]}` : name;
   
-  // Convert IPFS URLs to HTTP gateway URLs
+  // Convert IPFS URLs to HTTP gateway URLs (fallback only)
   const toHttpUrl = (url) => {
     if (!url) return null;
     if (url.startsWith('ipfs://')) {
       const hash = url.replace('ipfs://', '');
-      // Use dweb.link - the official IPFS gateway, more reliable for video
-      return `https://dweb.link/ipfs/${hash}`;
+      return `https://ipfs.io/ipfs/${hash}`;
     }
     return url;
   };
 
   // Try multiple sources for animation/video URL
+  // PRIORITY: Alchemy cached gateway URLs first (fast!), then fall back to IPFS
   const rawAnimationUrl =
-    metadata.animation_url ||
+    nft.media?.[0]?.gateway ||  // Alchemy's cached gateway - fastest
+    nft.media?.[0]?.raw ||      // Alchemy's raw URL
+    metadata.animation_url ||    // Metadata IPFS URL (fallback)
     nft.raw?.metadata?.animation_url ||
-    nft.media?.[0]?.gateway ||
-    nft.media?.[0]?.raw ||
     null;
 
-  // Get image, checking if it might actually be a video
-  const rawImageUrl = nft.image?.cachedUrl || nft.image?.thumbnailUrl || nft.image?.originalUrl || metadata.image;
+  // Get image - prefer Alchemy's cached URLs
+  const rawImageUrl = nft.image?.cachedUrl || nft.image?.pngUrl || nft.image?.thumbnailUrl || nft.image?.originalUrl || metadata.image;
   const imageUrl = toHttpUrl(rawImageUrl);
   const animationUrl = toHttpUrl(rawAnimationUrl);
   const isImageVideo = imageUrl && /\.(mp4|webm|mov|ogv)(\?|$)/i.test(imageUrl);
