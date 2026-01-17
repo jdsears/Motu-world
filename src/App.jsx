@@ -24,16 +24,29 @@ const CONFIG = {
 // ============================================
 async function fetchNFTsFromAlchemy(walletAddress, contractAddress, apiKey) {
   const baseUrl = `https://eth-mainnet.g.alchemy.com/nft/v3/${apiKey || 'demo'}/getNFTsForOwner`;
-  const url = `${baseUrl}?owner=${walletAddress}&contractAddresses[]=${contractAddress}&withMetadata=true`;
-  
+  let allNfts = [];
+  let pageKey = null;
+
   try {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    return data.ownedNfts || [];
+    // Paginate through all results
+    do {
+      let url = `${baseUrl}?owner=${walletAddress}&contractAddresses[]=${contractAddress}&withMetadata=true&pageSize=100`;
+      if (pageKey) {
+        url += `&pageKey=${pageKey}`;
+      }
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+
+      allNfts = [...allNfts, ...(data.ownedNfts || [])];
+      pageKey = data.pageKey || null;
+    } while (pageKey);
+
+    return allNfts;
   } catch (error) {
     console.error('Error fetching from Alchemy:', error);
-    return [];
+    return allNfts; // Return what we have so far
   }
 }
 
