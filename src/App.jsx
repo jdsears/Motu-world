@@ -502,8 +502,23 @@ function App() {
   const hasVideos = nfts.some(n => n.type === 'video');
   const hasPolaroids = nfts.some(n => n.type === 'polaroid');
 
+  // Generate sprocket holes for film borders
+  const sprocketCount = 50;
+
   return (
     <div className="app">
+      {/* Film Borders - Sprocket holes on left & right */}
+      <div className="film-border left">
+        {[...Array(sprocketCount)].map((_, i) => (
+          <div key={`l-${i}`} className="sprocket"></div>
+        ))}
+      </div>
+      <div className="film-border right">
+        {[...Array(sprocketCount)].map((_, i) => (
+          <div key={`r-${i}`} className="sprocket"></div>
+        ))}
+      </div>
+
       {/* Atmospheric Background */}
       <div className="bg-atmosphere">
         <div className="bg-gradient"></div>

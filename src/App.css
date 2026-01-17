@@ -109,6 +109,79 @@ body {
 }
 
 /* =====================================================
+   FILM BORDERS - Sprocket holes on left & right
+   ===================================================== */
+
+.film-border {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(90deg, #0d0b0a 0%, #151311 50%, #0d0b0a 100%);
+  z-index: 100;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  gap: 30px;
+  overflow: hidden;
+}
+
+.film-border::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(201, 168, 124, 0.15);
+}
+
+.film-border.left {
+  left: 0;
+  border-right: 1px solid rgba(201, 168, 124, 0.1);
+}
+
+.film-border.left::before {
+  right: 8px;
+}
+
+.film-border.right {
+  right: 0;
+  border-left: 1px solid rgba(201, 168, 124, 0.1);
+}
+
+.film-border.right::before {
+  left: 8px;
+}
+
+.sprocket {
+  width: 16px;
+  height: 10px;
+  background: #080706;
+  border-radius: 2px;
+  box-shadow:
+    inset 0 1px 2px rgba(0,0,0,0.8),
+    0 0 0 1px rgba(201, 168, 124, 0.1);
+  flex-shrink: 0;
+}
+
+/* Hide film borders on mobile */
+@media (max-width: 1200px) {
+  .film-border {
+    display: none;
+  }
+}
+
+/* Adjust main content padding for film borders */
+@media (min-width: 1201px) {
+  .app {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+/* =====================================================
    HEADER
    ===================================================== */
 
