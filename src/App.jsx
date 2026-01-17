@@ -267,9 +267,8 @@ const NFTCard = ({ nft, onClick, index }) => {
                   loop
                   playsInline
                   autoPlay
-                  onMouseEnter={(e) => e.target.play()}
+                  onMouseEnter={(e) => e.target.play().catch(() => {})}
                   onMouseLeave={(e) => { e.target.pause(); e.target.currentTime = 0; }}
-                  onError={(e) => console.error('Video load error:', nft.animationUrl, e)}
                 />
               ) : nft.image ? (
                 <img src={nft.image} alt={nft.name} loading="lazy" />
