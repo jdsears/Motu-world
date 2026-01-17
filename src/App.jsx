@@ -503,7 +503,7 @@ function App() {
               <span className="title-line">Moments of</span>
               <span className="title-line accent">The Unknown</span>
             </h1>
-            <p className="subtitle">A 366-day journey across seven continents</p>
+            <p className="subtitle">The jdsears_Vault Collection</p>
           </div>
           <div className="artist-credit">
             <span className="by">by</span>
@@ -523,18 +523,14 @@ function App() {
       <section className="collection-intro">
         <div className="intro-content">
           <p className="intro-text">
-            A cinematic portrait of humanity, captured over 366 days across all seven continents. 
-            Each 10-second Super 8 moment is tied to a specific calendar date, 
-            creating a living archive of global intimacy.
+            My collection from Justin Aversano's cinematic portrait of humanity,
+            captured over 366 days across all seven continents.
+            Each 10-second Super 8 moment is tied to a specific calendar date.
           </p>
           <div className="collection-stats">
             <div className="stat">
-              <span className="stat-number">366</span>
-              <span className="stat-label">Days</span>
-            </div>
-            <div className="stat">
-              <span className="stat-number">7</span>
-              <span className="stat-label">Continents</span>
+              <span className="stat-number">{nfts.length}</span>
+              <span className="stat-label">In Collection</span>
             </div>
             <div className="stat">
               <span className="stat-number">{nfts.filter(n => n.type === 'video').length}</span>
@@ -543,6 +539,10 @@ function App() {
             <div className="stat">
               <span className="stat-number">{nfts.filter(n => n.type === 'polaroid').length}</span>
               <span className="stat-label">Polaroids</span>
+            </div>
+            <div className="stat">
+              <span className="stat-number">{continents.length}</span>
+              <span className="stat-label">Continents</span>
             </div>
           </div>
           {dataSource === 'placeholder' && (
