@@ -570,19 +570,23 @@ body {
 
 /* Smaller gaps for dense views */
 .gallery-grid[style*="--columns: 10"],
-.gallery-grid[style*="--columns: 20"],
+.gallery-grid[style*="--columns: 25"],
 .gallery-grid[style*="--columns: 50"] {
   gap: 4px;
 }
 
-/* Hide info on dense views */
-.gallery-grid[style*="--columns: 20"] .nft-info,
+/* Hide info on dense views (10+) */
+.gallery-grid[style*="--columns: 10"] .nft-info,
+.gallery-grid[style*="--columns: 25"] .nft-info,
 .gallery-grid[style*="--columns: 50"] .nft-info,
-.gallery-grid[style*="--columns: 20"] .continent-tag,
+.gallery-grid[style*="--columns: 10"] .continent-tag,
+.gallery-grid[style*="--columns: 25"] .continent-tag,
 .gallery-grid[style*="--columns: 50"] .continent-tag,
-.gallery-grid[style*="--columns: 20"] .day-badge,
+.gallery-grid[style*="--columns: 10"] .day-badge,
+.gallery-grid[style*="--columns: 25"] .day-badge,
 .gallery-grid[style*="--columns: 50"] .day-badge,
-.gallery-grid[style*="--columns: 20"] .type-badge,
+.gallery-grid[style*="--columns: 10"] .type-badge,
+.gallery-grid[style*="--columns: 25"] .type-badge,
 .gallery-grid[style*="--columns: 50"] .type-badge {
   display: none;
 }

@@ -400,7 +400,7 @@ const NFTModal = ({ nft, onClose, onPrev, onNext, hasPrev, hasNext }) => {
 
 // Filter Component
 const FilterBar = ({ continents, activeFilter, setActiveFilter, typeFilter, setTypeFilter, totalCount, hasVideos, hasPolaroids, columns, setColumns }) => {
-  const columnOptions = [5, 10, 20, 50];
+  const columnOptions = [5, 10, 25, 50];
 
   return (
     <div className="filter-bar">
