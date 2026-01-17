@@ -583,20 +583,6 @@ function App() {
             View Full Collection →
           </a>
         </div>
-        <div className="refresh-section">
-          <button
-            className="refresh-btn"
-            onClick={loadNFTs}
-            disabled={loading}
-          >
-            {loading ? 'Refreshing...' : 'Refresh Collection'}
-          </button>
-          {lastUpdated && (
-            <span className="last-updated">
-              Updated {lastUpdated.toLocaleTimeString()}
-            </span>
-          )}
-        </div>
       </section>
 
       {/* Filter Bar */}
@@ -645,8 +631,8 @@ function App() {
       <footer className="footer">
         <div className="footer-content">
           <div className="footer-quote">
-            "What I discovered while shooting is that love has so many forms. 
-            It became about unity, closeness, intimacy. 
+            "What I discovered while shooting is that love has so many forms.
+            It became about unity, closeness, intimacy.
             The love of humanity and recognizing we are one human family."
           </div>
           <div className="footer-credit">— Justin Aversano</div>
@@ -659,6 +645,19 @@ function App() {
           <a href="https://twitter.com/justinaversano" target="_blank" rel="noopener noreferrer">
             @justinaversano
           </a>
+          <span className="divider">•</span>
+          <button
+            className="footer-refresh-btn"
+            onClick={loadNFTs}
+            disabled={loading}
+          >
+            {loading ? '...' : 'Refresh'}
+          </button>
+          {lastUpdated && (
+            <span className="footer-updated">
+              {lastUpdated.toLocaleTimeString()}
+            </span>
+          )}
         </div>
       </footer>
     </div>
