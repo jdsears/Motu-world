@@ -353,7 +353,7 @@ const NFTModal = ({ nft, onClose }) => {
           </div>
           
           {nft.description && (
-            <p className="modal-description">{nft.description.substring(0, 300)}{nft.description.length > 300 ? '...' : ''}</p>
+            <p className="modal-description">{nft.description}</p>
           )}
           
           <div className="modal-meta">
