@@ -277,6 +277,35 @@ const NFTCard = ({ nft, onClick, index }) => {
   );
 };
 
+// Parse structured description into clean format
+const parseDescription = (description) => {
+  if (!description) return null;
+
+  // Common field patterns in MOTU metadata
+  const fields = {};
+  const fieldPatterns = [
+    { key: 'title', pattern: /Title:\s*([^:]+?)(?=\s*(?:Medium|Dimensions|Comments|$))/i },
+    { key: 'medium', pattern: /Medium:\s*([^:]+?)(?=\s*(?:Dimensions|Comments|$))/i },
+    { key: 'dimensions', pattern: /Dimensions\s*:\s*([^:]+?)(?=\s*(?:Comments|$))/i },
+    { key: 'comments', pattern: /Comments:\s*(.+)$/i }
+  ];
+
+  for (const { key, pattern } of fieldPatterns) {
+    const match = description.match(pattern);
+    if (match) {
+      fields[key] = match[1].trim();
+    }
+  }
+
+  // If we found structured fields, return them
+  if (Object.keys(fields).length > 0) {
+    return fields;
+  }
+
+  // Otherwise return the raw description as comments
+  return { comments: description };
+};
+
 // Modal Component for detailed view
 const NFTModal = ({ nft, onClose }) => {
   const dayNumber = getDayNumber(nft.date);
@@ -351,9 +380,30 @@ const NFTModal = ({ nft, onClose }) => {
             </div>
           </div>
           
-          {nft.description && (
-            <p className="modal-description">{nft.description}</p>
-          )}
+          {nft.description && (() => {
+            const parsed = parseDescription(nft.description);
+            return (
+              <div className="modal-description-section">
+                {parsed.comments && (
+                  <p className="modal-description">{parsed.comments}</p>
+                )}
+                {(parsed.medium || parsed.dimensions) && (
+                  <div className="modal-artwork-details">
+                    {parsed.medium && (
+                      <span className="artwork-detail">
+                        <span className="detail-label">Medium:</span> {parsed.medium}
+                      </span>
+                    )}
+                    {parsed.dimensions && (
+                      <span className="artwork-detail">
+                        <span className="detail-label">Size:</span> {parsed.dimensions}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
           
           <div className="modal-meta">
             <div className="meta-item">
