@@ -255,6 +255,14 @@ body {
   letter-spacing: 0.05em;
 }
 
+.collector-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
 .header-decoration {
   margin-top: var(--space-lg);
   overflow: hidden;

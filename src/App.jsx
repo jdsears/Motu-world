@@ -679,11 +679,10 @@ function App() {
               <span className="title-line">Moments of</span>
               <span className="title-line accent">The Unknown</span>
             </h1>
-            <p className="subtitle">The jdsears Collection</p>
+            <p className="subtitle">by Justin Aversano</p>
           </div>
           <div className="artist-credit">
-            <span className="by">by</span>
-            <span className="artist-name">Justin Aversano</span>
+            <span className="collector-tag">The jdsears Collection</span>
           </div>
         </div>
         <div className="header-decoration">
