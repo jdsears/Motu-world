@@ -486,7 +486,7 @@ function App() {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [activeFilter, setActiveFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all'); // 'all', 'video', 'polaroid'
-  const [columns, setColumns] = useState(5); // 5, 10, 20, 50
+  const [columns, setColumns] = useState(25); // 5, 10, 25, 50
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [dataSource, setDataSource] = useState('placeholder');
