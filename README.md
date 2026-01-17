@@ -143,20 +143,19 @@ const PLACEHOLDER_NFTS = [
    railway up
    ```
 
-### Environment Variables (If Using OpenSea API)
+### Environment Variables
 
 In Railway dashboard:
 1. Go to your project → Variables
-2. Add: `VITE_OPENSEA_API_KEY` = your_api_key
+2. Add: `VITE_ALCHEMY_API_KEY` = your_alchemy_api_key
 
 ## Project Structure
 
 ```
-motu-gallery/
 ├── src/
 │   ├── App.jsx        # Main React component
 │   ├── App.css        # Styles with cinematic aesthetic
-│   ├── api.js         # OpenSea API utilities
+│   ├── api.js         # Alchemy API utilities
 │   └── main.jsx       # Entry point
 ├── public/
 │   └── favicon.svg    # Film-inspired favicon
