@@ -231,7 +231,7 @@ const NFTCard = ({ nft, onClick, index }) => {
   return (
     <div
       className="nft-card"
-      onClick={() => onClick(nft)}
+      onClick={onClick}
       style={{ animationDelay: `${index * 0.1}s` }}
     >
       <div className="nft-card-inner">
@@ -321,7 +321,7 @@ const parseDescription = (description) => {
 };
 
 // Modal Component for detailed view
-const NFTModal = ({ nft, onClose }) => {
+const NFTModal = ({ nft, onClose, onPrev, onNext, hasPrev, hasNext }) => {
   const dayNumber = getDayNumber(nft.date);
   const isVideo = nft.type === 'video';
   const hasMedia = nft.animationUrl || nft.image;
@@ -338,19 +338,39 @@ const NFTModal = ({ nft, onClose }) => {
   };
 
   useEffect(() => {
-    const handleEscape = (e) => {
+    const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowLeft' && hasPrev) onPrev();
+      if (e.key === 'ArrowRight' && hasNext) onNext();
     };
-    document.addEventListener('keydown', handleEscape);
+    document.addEventListener('keydown', handleKeyDown);
     document.body.style.overflow = 'hidden';
     return () => {
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = '';
     };
-  }, [onClose]);
+  }, [onClose, onPrev, onNext, hasPrev, hasNext]);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
+      {/* Navigation arrows */}
+      <button
+        className="modal-nav prev"
+        onClick={(e) => { e.stopPropagation(); onPrev(); }}
+        disabled={!hasPrev}
+        aria-label="Previous"
+      >
+        ←
+      </button>
+      <button
+        className="modal-nav next"
+        onClick={(e) => { e.stopPropagation(); onNext(); }}
+        disabled={!hasNext}
+        aria-label="Next"
+      >
+        →
+      </button>
+
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>✕</button>
         
@@ -610,7 +630,7 @@ const DebugPanel = ({ logs, isOpen, onToggle, onClear, apiKeyStatus, dataSource 
 // Main App Component
 function App() {
   const [nfts, setNfts] = useState(SAMPLE_NFTS);
-  const [selectedNFT, setSelectedNFT] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(null);
   const [activeFilter, setActiveFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all'); // 'all', 'video', 'polaroid'
   const [loading, setLoading] = useState(false);
@@ -846,10 +866,10 @@ function App() {
         ) : (
           <div className="gallery-grid">
             {sortedNFTs.map((nft, index) => (
-              <NFTCard 
-                key={nft.id} 
-                nft={nft} 
-                onClick={setSelectedNFT}
+              <NFTCard
+                key={nft.id}
+                nft={nft}
+                onClick={() => setSelectedIndex(index)}
                 index={index}
               />
             ))}
@@ -858,8 +878,15 @@ function App() {
       </main>
 
       {/* Modal */}
-      {selectedNFT && (
-        <NFTModal nft={selectedNFT} onClose={() => setSelectedNFT(null)} />
+      {selectedIndex !== null && sortedNFTs[selectedIndex] && (
+        <NFTModal
+          nft={sortedNFTs[selectedIndex]}
+          onClose={() => setSelectedIndex(null)}
+          onPrev={() => setSelectedIndex(i => Math.max(0, i - 1))}
+          onNext={() => setSelectedIndex(i => Math.min(sortedNFTs.length - 1, i + 1))}
+          hasPrev={selectedIndex > 0}
+          hasNext={selectedIndex < sortedNFTs.length - 1}
+        />
       )}
 
       {/* Footer */}
