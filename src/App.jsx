@@ -106,13 +106,13 @@ function transformAlchemyNFT(nft, type = 'video') {
   const dateMatch = name.match(/^(\w+)\s+(\d+)/);
   const date = dateMatch ? `${dateMatch[1]} ${dateMatch[2]}` : name;
   
-  // Convert IPFS URLs to HTTP gateway URLs
+  // Convert IPFS URLs to HTTP gateway URLs (using fast Cloudflare gateway)
   const toHttpUrl = (url) => {
     if (!url) return null;
     if (url.startsWith('ipfs://')) {
-      // Convert ipfs:// to HTTP gateway
       const hash = url.replace('ipfs://', '');
-      return `https://ipfs.io/ipfs/${hash}`;
+      // Cloudflare's gateway is typically faster than ipfs.io
+      return `https://cloudflare-ipfs.com/ipfs/${hash}`;
     }
     return url;
   };
@@ -263,6 +263,8 @@ const NFTCard = ({ nft, onClick, index }) => {
                 <video
                   ref={handleVideoRef}
                   src={nft.animationUrl}
+                  poster={nft.image || undefined}
+                  preload="metadata"
                   muted
                   loop
                   playsInline
@@ -392,13 +394,14 @@ const NFTModal = ({ nft, onClose, onPrev, onNext, hasPrev, hasNext }) => {
             <video
               ref={handleVideoRef}
               src={nft.animationUrl}
+              poster={nft.image || undefined}
+              preload="auto"
               controls
               autoPlay
               loop
               muted
               playsInline
               className="modal-media-full"
-              onError={(e) => console.error('Modal video load error:', nft.animationUrl, e)}
             />
           ) : (
             <img src={nft.image} alt={nft.name} className="modal-media-full" />
