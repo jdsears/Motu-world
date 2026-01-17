@@ -106,6 +106,18 @@ function transformAlchemyNFT(nft, type = 'video') {
   const dateMatch = name.match(/^(\w+)\s+(\d+)/);
   const date = dateMatch ? `${dateMatch[1]} ${dateMatch[2]}` : name;
   
+  // Try multiple sources for animation/video URL
+  const animationUrl =
+    metadata.animation_url ||
+    nft.raw?.metadata?.animation_url ||
+    nft.media?.[0]?.gateway ||
+    nft.media?.[0]?.raw ||
+    null;
+
+  // Get image, checking if it might actually be a video
+  const imageUrl = nft.image?.cachedUrl || nft.image?.thumbnailUrl || nft.image?.originalUrl || metadata.image;
+  const isImageVideo = imageUrl && /\.(mp4|webm|mov|ogv)(\?|$)/i.test(imageUrl);
+
   return {
     id: `${type}-${nft.tokenId}`,
     tokenId: nft.tokenId,
@@ -113,8 +125,8 @@ function transformAlchemyNFT(nft, type = 'video') {
     date: date,
     location: location,
     description: metadata.description || '',
-    image: nft.image?.cachedUrl || nft.image?.thumbnailUrl || metadata.image,
-    animationUrl: metadata.animation_url || nft.raw?.metadata?.animation_url,
+    image: isImageVideo ? null : imageUrl,
+    animationUrl: animationUrl || (isImageVideo ? imageUrl : null),
     continent: continent,
     type: type, // 'video' or 'polaroid'
     contract: type === 'video' ? CONFIG.contracts.videos : CONFIG.contracts.polaroids,
@@ -209,6 +221,7 @@ const NFTCard = ({ nft, onClick, index }) => {
   // Handle video autoplay
   const handleVideoRef = (video) => {
     if (video) {
+      video.muted = true; // Ensure muted for autoplay policy
       video.play().catch(() => {
         // Autoplay blocked - will play on hover instead
       });
@@ -243,6 +256,7 @@ const NFTCard = ({ nft, onClick, index }) => {
                   autoPlay
                   onMouseEnter={(e) => e.target.play()}
                   onMouseLeave={(e) => { e.target.pause(); e.target.currentTime = 0; }}
+                  onError={(e) => console.error('Video load error:', nft.animationUrl, e)}
                 />
               ) : nft.image ? (
                 <img src={nft.image} alt={nft.name} loading="lazy" />
@@ -312,7 +326,17 @@ const NFTModal = ({ nft, onClose }) => {
   const isVideo = nft.type === 'video';
   const hasMedia = nft.animationUrl || nft.image;
   const contractAddress = nft.contract || (isVideo ? CONFIG.contracts.videos : CONFIG.contracts.polaroids);
-  
+
+  // Handle video autoplay
+  const handleVideoRef = (video) => {
+    if (video) {
+      video.muted = true; // Ensure muted for autoplay
+      video.play().catch(() => {
+        // Autoplay blocked - user can use controls
+      });
+    }
+  };
+
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') onClose();
@@ -335,13 +359,15 @@ const NFTModal = ({ nft, onClose }) => {
           {hasMedia ? (
             <div className="modal-video-container">
               {nft.animationUrl ? (
-                <video 
-                  src={nft.animationUrl} 
-                  controls 
-                  autoPlay 
-                  loop 
+                <video
+                  ref={handleVideoRef}
+                  src={nft.animationUrl}
+                  controls
+                  autoPlay
+                  loop
                   muted
                   playsInline
+                  onError={(e) => console.error('Modal video load error:', nft.animationUrl, e)}
                 />
               ) : nft.image ? (
                 <img src={nft.image} alt={nft.name} />
