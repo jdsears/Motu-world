@@ -9,5 +9,8 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist'
+  },
+  define: {
+    'import.meta.env.VITE_ALCHEMY_API_KEY': JSON.stringify(process.env.VITE_ALCHEMY_API_KEY)
   }
 });
