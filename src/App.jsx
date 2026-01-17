@@ -423,62 +423,65 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [dataSource, setDataSource] = useState('placeholder');
+  const [lastUpdated, setLastUpdated] = useState(null);
+
+  // Reusable function to load NFTs
+  const loadNFTs = useCallback(async () => {
+    const apiKey = import.meta.env.VITE_ALCHEMY_API_KEY;
+
+    if (!apiKey) {
+      console.log('No Alchemy API key found. Using placeholder data.');
+      console.log('To load your actual NFTs, add VITE_ALCHEMY_API_KEY to your .env file');
+      setDataSource('placeholder');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Fetch video moments (ERC-721)
+      const videoNFTs = await fetchNFTsFromAlchemy(
+        CONFIG.walletAddress,
+        CONFIG.contracts.videos,
+        apiKey
+      );
+
+      // Fetch polaroids (ERC-1155)
+      const polaroidNFTs = await fetchNFTsFromAlchemy(
+        CONFIG.walletAddress,
+        CONFIG.contracts.polaroids,
+        apiKey
+      );
+
+      // Transform and combine
+      const transformedVideos = videoNFTs.map(nft => transformAlchemyNFT(nft, 'video'));
+      const transformedPolaroids = polaroidNFTs.map(nft => transformAlchemyNFT(nft, 'polaroid'));
+
+      const allNFTs = [...transformedVideos, ...transformedPolaroids];
+
+      if (allNFTs.length > 0) {
+        setNfts(allNFTs);
+        setDataSource('api');
+        setLastUpdated(new Date());
+        console.log(`Loaded ${transformedVideos.length} videos and ${transformedPolaroids.length} polaroids`);
+      } else {
+        console.log('No NFTs found for this wallet. Using placeholder data.');
+        setDataSource('placeholder');
+      }
+    } catch (err) {
+      console.error('Error loading NFTs:', err);
+      setError('Failed to load NFTs. Showing placeholder data.');
+      setDataSource('placeholder');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // Fetch NFTs from API on mount
   useEffect(() => {
-    const loadNFTs = async () => {
-      const apiKey = import.meta.env.VITE_ALCHEMY_API_KEY;
-      
-      if (!apiKey) {
-        console.log('No Alchemy API key found. Using placeholder data.');
-        console.log('To load your actual NFTs, add VITE_ALCHEMY_API_KEY to your .env file');
-        setDataSource('placeholder');
-        return;
-      }
-      
-      setLoading(true);
-      setError(null);
-      
-      try {
-        // Fetch video moments (ERC-721)
-        const videoNFTs = await fetchNFTsFromAlchemy(
-          CONFIG.walletAddress,
-          CONFIG.contracts.videos,
-          apiKey
-        );
-        
-        // Fetch polaroids (ERC-1155)
-        const polaroidNFTs = await fetchNFTsFromAlchemy(
-          CONFIG.walletAddress,
-          CONFIG.contracts.polaroids,
-          apiKey
-        );
-        
-        // Transform and combine
-        const transformedVideos = videoNFTs.map(nft => transformAlchemyNFT(nft, 'video'));
-        const transformedPolaroids = polaroidNFTs.map(nft => transformAlchemyNFT(nft, 'polaroid'));
-        
-        const allNFTs = [...transformedVideos, ...transformedPolaroids];
-        
-        if (allNFTs.length > 0) {
-          setNfts(allNFTs);
-          setDataSource('api');
-          console.log(`Loaded ${transformedVideos.length} videos and ${transformedPolaroids.length} polaroids`);
-        } else {
-          console.log('No NFTs found for this wallet. Using placeholder data.');
-          setDataSource('placeholder');
-        }
-      } catch (err) {
-        console.error('Error loading NFTs:', err);
-        setError('Failed to load NFTs. Showing placeholder data.');
-        setDataSource('placeholder');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
     loadNFTs();
-  }, []);
+  }, [loadNFTs]);
 
   // Get unique continents for filtering
   const continents = [...new Set(nfts.map(nft => nft.continent))].filter(Boolean).sort();
@@ -571,7 +574,7 @@ function App() {
         <div className="collector-badge">
           <span className="collector-label">Collected by</span>
           <span className="collector-name">jdsears_Vault</span>
-          <a 
+          <a
             href={`https://opensea.io/jdsears_Vault`}
             target="_blank"
             rel="noopener noreferrer"
@@ -579,6 +582,20 @@ function App() {
           >
             View Full Collection →
           </a>
+        </div>
+        <div className="refresh-section">
+          <button
+            className="refresh-btn"
+            onClick={loadNFTs}
+            disabled={loading}
+          >
+            {loading ? 'Refreshing...' : 'Refresh Collection'}
+          </button>
+          {lastUpdated && (
+            <span className="last-updated">
+              Updated {lastUpdated.toLocaleTimeString()}
+            </span>
+          )}
         </div>
       </section>
 

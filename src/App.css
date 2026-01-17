@@ -312,6 +312,44 @@ body {
   color: var(--accent-gold);
 }
 
+.refresh-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-top: var(--space-md);
+}
+
+.refresh-btn {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid rgba(201, 168, 124, 0.3);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  border-color: var(--accent-warm);
+  color: var(--accent-warm);
+}
+
+.refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.last-updated {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
 /* =====================================================
    FILTER BAR
    ===================================================== */
