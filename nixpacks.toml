@@ -7,5 +7,8 @@ cmds = ["npm install"]
 [phases.build]
 cmds = ["npm run build"]
 
+[variables]
+VITE_ALCHEMY_API_KEY = "${VITE_ALCHEMY_API_KEY}"
+
 [start]
 cmd = "npx serve dist -s -l ${PORT:-3000}"
