@@ -384,123 +384,37 @@ const NFTModal = ({ nft, onClose, onPrev, onNext, hasPrev, hasNext }) => {
         →
       </button>
 
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content simple" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>✕</button>
-        
-        <div className="modal-media">
-          <div className="film-grain"></div>
-          {hasMedia ? (
-            <div className="modal-video-container">
-              {nft.animationUrl ? (
-                <video
-                  ref={handleVideoRef}
-                  src={nft.animationUrl}
-                  controls
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  onError={(e) => console.error('Modal video load error:', nft.animationUrl, e)}
-                />
-              ) : nft.image ? (
-                <img src={nft.image} alt={nft.name} />
-              ) : null}
-            </div>
+
+        {/* Main media display */}
+        {hasMedia ? (
+          nft.animationUrl ? (
+            <video
+              ref={handleVideoRef}
+              src={nft.animationUrl}
+              controls
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="modal-media-full"
+              onError={(e) => console.error('Modal video load error:', nft.animationUrl, e)}
+            />
           ) : (
-            <div className="modal-placeholder">
-              <div className="super8-frame large">
-                <div className="sprocket-holes left">
-                  {[...Array(6)].map((_, i) => <div key={i} className="hole"></div>)}
-                </div>
-                <div className="frame-content">
-                  <span className="play-icon large">{isVideo ? '▶' : '◻'}</span>
-                  <p className="play-text">{isVideo ? '10-second Super 8 moment' : 'Polaroid photograph'}</p>
-                </div>
-                <div className="sprocket-holes right">
-                  {[...Array(6)].map((_, i) => <div key={i} className="hole"></div>)}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-        
-        <div className="modal-info">
-          <div className="modal-header">
-            <div className="day-display">
-              <span className="day-big">{dayNumber || '?'}</span>
-              <span className="day-total">/ 366</span>
-            </div>
-            <div className="date-location">
-              <h2 className="modal-date">{nft.date}</h2>
-              <p className="modal-location">
-                <span className="location-pin">◉</span>
-                {nft.location}
-              </p>
-            </div>
+            <img src={nft.image} alt={nft.name} className="modal-media-full" />
+          )
+        ) : (
+          <div className="modal-no-media">
+            <span>{isVideo ? '▶ Video' : '◻ Polaroid'}</span>
           </div>
-          
-          {nft.description && (() => {
-            const parsed = parseDescription(nft.description);
-            return (
-              <div className="modal-description-section">
-                {parsed.comments && (
-                  <p className="modal-description">{parsed.comments}</p>
-                )}
-                {(parsed.medium || parsed.dimensions) && (
-                  <div className="modal-artwork-details">
-                    {parsed.medium && (
-                      <span className="artwork-detail">
-                        <span className="detail-label">Medium:</span> {parsed.medium}
-                      </span>
-                    )}
-                    {parsed.dimensions && (
-                      <span className="artwork-detail">
-                        <span className="detail-label">Size:</span> {parsed.dimensions}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-          
-          <div className="modal-meta">
-            <div className="meta-item">
-              <span className="meta-label">Type</span>
-              <span className="meta-value">{isVideo ? 'Video Moment' : 'Polaroid'}</span>
-            </div>
-            <div className="meta-item">
-              <span className="meta-label">Continent</span>
-              <span className="meta-value">{nft.continent}</span>
-            </div>
-            <div className="meta-item">
-              <span className="meta-label">Token ID</span>
-              <span className="meta-value">#{nft.tokenId}</span>
-            </div>
-            <div className="meta-item">
-              <span className="meta-label">Format</span>
-              <span className="meta-value">{isVideo ? 'Super 8 Film' : 'Polaroid'}</span>
-            </div>
-          </div>
-          
-          <div className="modal-links">
-            <a 
-              href={nft.openseaUrl || `https://opensea.io/assets/ethereum/${contractAddress}/${nft.tokenId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="opensea-link"
-            >
-              View on OpenSea →
-            </a>
-            <a 
-              href={`https://etherscan.io/token/${contractAddress}?a=${nft.tokenId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="etherscan-link"
-            >
-              Etherscan →
-            </a>
-          </div>
+        )}
+
+        {/* Simple caption */}
+        <div className="modal-caption">
+          <span className="caption-day">Day {dayNumber}/366</span>
+          <span className="caption-date">{nft.date}</span>
+          <span className="caption-location">{nft.location}</span>
         </div>
       </div>
     </div>
