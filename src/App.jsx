@@ -84,13 +84,13 @@ function transformAlchemyNFT(nft, type = 'video') {
   const dateMatch = name.match(/^(\w+)\s+(\d+)/);
   const date = dateMatch ? `${dateMatch[1]} ${dateMatch[2]}` : name;
   
-  // Convert IPFS URLs to HTTP gateway URLs (using fast Cloudflare gateway)
+  // Convert IPFS URLs to HTTP gateway URLs
   const toHttpUrl = (url) => {
     if (!url) return null;
     if (url.startsWith('ipfs://')) {
       const hash = url.replace('ipfs://', '');
-      // Cloudflare's gateway is typically faster than ipfs.io
-      return `https://cloudflare-ipfs.com/ipfs/${hash}`;
+      // Use dweb.link - the official IPFS gateway, more reliable for video
+      return `https://dweb.link/ipfs/${hash}`;
     }
     return url;
   };
@@ -241,14 +241,12 @@ const NFTCard = ({ nft, onClick, index }) => {
                 <video
                   ref={handleVideoRef}
                   src={nft.animationUrl}
-                  poster={nft.image || undefined}
-                  preload="metadata"
+                  preload="auto"
                   muted
                   loop
                   playsInline
                   autoPlay
                   onMouseEnter={(e) => e.target.play().catch(() => {})}
-                  onMouseLeave={(e) => { e.target.pause(); e.target.currentTime = 0; }}
                 />
               ) : nft.image ? (
                 <img src={nft.image} alt={nft.name} loading="lazy" />
@@ -372,7 +370,6 @@ const NFTModal = ({ nft, onClose, onPrev, onNext, hasPrev, hasNext }) => {
             <video
               ref={handleVideoRef}
               src={nft.animationUrl}
-              poster={nft.image || undefined}
               preload="auto"
               controls
               autoPlay
