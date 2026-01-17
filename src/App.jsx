@@ -106,8 +106,19 @@ function transformAlchemyNFT(nft, type = 'video') {
   const dateMatch = name.match(/^(\w+)\s+(\d+)/);
   const date = dateMatch ? `${dateMatch[1]} ${dateMatch[2]}` : name;
   
+  // Convert IPFS URLs to HTTP gateway URLs
+  const toHttpUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('ipfs://')) {
+      // Convert ipfs:// to HTTP gateway
+      const hash = url.replace('ipfs://', '');
+      return `https://ipfs.io/ipfs/${hash}`;
+    }
+    return url;
+  };
+
   // Try multiple sources for animation/video URL
-  const animationUrl =
+  const rawAnimationUrl =
     metadata.animation_url ||
     nft.raw?.metadata?.animation_url ||
     nft.media?.[0]?.gateway ||
@@ -115,7 +126,9 @@ function transformAlchemyNFT(nft, type = 'video') {
     null;
 
   // Get image, checking if it might actually be a video
-  const imageUrl = nft.image?.cachedUrl || nft.image?.thumbnailUrl || nft.image?.originalUrl || metadata.image;
+  const rawImageUrl = nft.image?.cachedUrl || nft.image?.thumbnailUrl || nft.image?.originalUrl || metadata.image;
+  const imageUrl = toHttpUrl(rawImageUrl);
+  const animationUrl = toHttpUrl(rawAnimationUrl);
   const isImageVideo = imageUrl && /\.(mp4|webm|mov|ogv)(\?|$)/i.test(imageUrl);
 
   return {
