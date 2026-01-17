@@ -503,7 +503,7 @@ function App() {
               <span className="title-line">Moments of</span>
               <span className="title-line accent">The Unknown</span>
             </h1>
-            <p className="subtitle">The jdsears_Vault Collection</p>
+            <p className="subtitle">The jdsears Collection</p>
           </div>
           <div className="artist-credit">
             <span className="by">by</span>
