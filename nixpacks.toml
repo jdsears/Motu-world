@@ -7,8 +7,7 @@ cmds = ["npm install"]
 [phases.build]
 cmds = ["npm run build"]
 
-[variables]
-VITE_ALCHEMY_API_KEY = "${VITE_ALCHEMY_API_KEY}"
+# Railway injects env vars automatically - no need to declare them here
 
 [start]
 cmd = "npx serve dist -s -l ${PORT:-3000}"
