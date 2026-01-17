@@ -564,20 +564,27 @@ body {
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: var(--space-md);
+  grid-template-columns: repeat(var(--columns, 5), 1fr);
+  gap: var(--space-sm);
 }
 
-@media (max-width: 1400px) {
-  .gallery-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+/* Smaller gaps for dense views */
+.gallery-grid[style*="--columns: 10"],
+.gallery-grid[style*="--columns: 20"],
+.gallery-grid[style*="--columns: 50"] {
+  gap: 4px;
 }
 
-@media (max-width: 1100px) {
-  .gallery-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+/* Hide info on dense views */
+.gallery-grid[style*="--columns: 20"] .nft-info,
+.gallery-grid[style*="--columns: 50"] .nft-info,
+.gallery-grid[style*="--columns: 20"] .continent-tag,
+.gallery-grid[style*="--columns: 50"] .continent-tag,
+.gallery-grid[style*="--columns: 20"] .day-badge,
+.gallery-grid[style*="--columns: 50"] .day-badge,
+.gallery-grid[style*="--columns: 20"] .type-badge,
+.gallery-grid[style*="--columns: 50"] .type-badge {
+  display: none;
 }
 
 /* =====================================================
@@ -1421,9 +1428,10 @@ body {
     gap: var(--space-lg);
   }
 
+  /* On mobile, respect user choice but use min 3 cols for readability */
   .gallery-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-md);
+    grid-template-columns: repeat(min(var(--columns, 5), 10), 1fr);
+    gap: 4px;
   }
 
   .filter-bar {
@@ -1437,8 +1445,9 @@ body {
 }
 
 @media (max-width: 480px) {
+  /* Very small screens - cap at 5 columns max */
   .gallery-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(min(var(--columns, 5), 5), 1fr);
   }
 
   .collection-stats {
