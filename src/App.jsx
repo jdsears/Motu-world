@@ -952,21 +952,14 @@ function App() {
       <header className="header">
         <div className="header-content">
           <div className="logo-section">
+            <p className="artist-name">JUSTIN AVERSANO</p>
             <h1 className="title">
-              <span className="title-line">Moments of</span>
-              <span className="title-line accent">The Unknown</span>
+              <span className="title-main">Moments</span>
+              <span className="title-sub"><span className="title-muted">OF THE </span>Unknown</span>
             </h1>
-            <p className="subtitle">by Justin Aversano</p>
           </div>
           <div className="artist-credit">
             <span className="collector-tag">The jdsears Collection</span>
-          </div>
-        </div>
-        <div className="header-decoration">
-          <div className="film-strip">
-            {[...Array(20)].map((_, i) => (
-              <div key={i} className="film-hole"></div>
-            ))}
           </div>
         </div>
       </header>
