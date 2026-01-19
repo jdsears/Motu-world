@@ -707,7 +707,7 @@ function App() {
 
           <div className="connection-footer">
             <p className="connection-philosophy">
-              "In the end, we don't remember days. We remember moments—and the people who made them matter."
+              "In the end, we don't remember days. We remember moments, and the people who made them matter."
             </p>
             <span className="connection-signature">jdsears</span>
           </div>
