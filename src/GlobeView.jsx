@@ -235,33 +235,33 @@ const GlobeView = ({ videos, onSelectVideo }) => {
     <div className="globe-container">
       <Globe
         ref={globeRef}
-        globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
+        globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
         bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
         backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
 
-        // Points layer
+        // Points layer - gold/warm color to match site theme
         pointsData={points}
         pointLat="lat"
         pointLng="lng"
-        pointColor={() => '#ff3333'}
-        pointAltitude={0.01}
-        pointRadius={0.5}
+        pointColor={() => '#ff4444'}
+        pointAltitude={0.02}
+        pointRadius={0.6}
         pointsMerge={false}
         onPointClick={handlePointClick}
         onPointHover={setHoveredPoint}
 
-        // Rings layer (pulsing effect)
+        // Rings layer (pulsing effect) - warm gold rings
         ringsData={points}
         ringLat="lat"
         ringLng="lng"
-        ringColor={() => t => `rgba(255, 51, 51, ${1 - t})`}
-        ringMaxRadius={3}
-        ringPropagationSpeed={2}
-        ringRepeatPeriod={1500}
+        ringColor={() => t => `rgba(255, 68, 68, ${1 - t})`}
+        ringMaxRadius={4}
+        ringPropagationSpeed={3}
+        ringRepeatPeriod={1200}
 
-        // Arcs for visual effect (optional - connects nearby points)
-        atmosphereColor="#ff6666"
-        atmosphereAltitude={0.15}
+        // Atmosphere - soft blue glow
+        atmosphereColor="#4da6ff"
+        atmosphereAltitude={0.2}
 
         // Styling
         width={window.innerWidth}
