@@ -268,12 +268,30 @@ const GlobeView = ({ videos, onSelectVideo }) => {
         height={window.innerHeight - 200}
       />
 
-      {/* Hover tooltip */}
+      {/* Hover preview card */}
       {hoveredPoint && !selectedPoint && (
-        <div className="globe-tooltip">
-          <span className="tooltip-day">Day {hoveredPoint.dayNumber}</span>
-          <span className="tooltip-date">{hoveredPoint.date}</span>
-          <span className="tooltip-location">{hoveredPoint.location}</span>
+        <div className="globe-hover-card">
+          <div className="hover-card-media">
+            {hoveredPoint.animationUrl ? (
+              <video
+                src={hoveredPoint.animationUrl}
+                muted
+                loop
+                playsInline
+                autoPlay
+              />
+            ) : (
+              <div className="hover-card-placeholder">
+                <span>▶</span>
+              </div>
+            )}
+          </div>
+          <div className="hover-card-info">
+            <span className="hover-card-day">Day {hoveredPoint.dayNumber}/366</span>
+            <h3 className="hover-card-date">{hoveredPoint.date}</h3>
+            <p className="hover-card-location">{hoveredPoint.location}</p>
+            <span className="hover-card-hint">Click for details</span>
+          </div>
         </div>
       )}
 
