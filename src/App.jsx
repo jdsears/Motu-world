@@ -670,7 +670,7 @@ function App() {
               <div className="moment-card">
                 <span className="moment-icon">🌸</span>
                 <span className="moment-place">Tokyo, Japan</span>
-                <span className="moment-why">Where I first fell in love with street photography</span>
+                <span className="moment-why">My first extreme & beautiful cultural experience, aged 12</span>
               </div>
               <div className="moment-card">
                 <span className="moment-icon">🗼</span>
@@ -686,6 +686,21 @@ function App() {
                 <span className="moment-icon">🏔️</span>
                 <span className="moment-place">Mt. Fuji, Japan</span>
                 <span className="moment-why">Sacred ground, sacred moments</span>
+              </div>
+              <div className="moment-card">
+                <span className="moment-icon">🎂</span>
+                <span className="moment-place">September 20th</span>
+                <span className="moment-why">Jude's Birthday</span>
+              </div>
+              <div className="moment-card">
+                <span className="moment-icon">🎂</span>
+                <span className="moment-place">October 5th</span>
+                <span className="moment-why">Grace's Birthday</span>
+              </div>
+              <div className="moment-card">
+                <span className="moment-icon">🎂</span>
+                <span className="moment-place">January 6th</span>
+                <span className="moment-why">Antonia's Birthday</span>
               </div>
             </div>
           </div>
