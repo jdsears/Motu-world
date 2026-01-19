@@ -353,7 +353,7 @@ const GlobeView = ({ videos, onSelectVideo }) => {
       <div className="globe-stats">
         <span className="globe-stat">{points.length} Locations</span>
         <span className="globe-stat-divider">•</span>
-        <span className="globe-stat">7 Continents</span>
+        <span className="globe-stat">{new Set(points.map(p => p.continent).filter(Boolean)).size} Continents</span>
       </div>
 
       {/* Instructions */}
