@@ -388,62 +388,144 @@ body {
 }
 
 /* =====================================================
-   WHY I COLLECT SECTION
+   PERSONAL CONNECTION SECTION
    ===================================================== */
 
-.why-collect {
+.personal-connection {
   position: relative;
   z-index: 10;
   padding: var(--space-xl) var(--space-lg);
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
-.why-collect-content {
+.connection-content {
+  position: relative;
+}
+
+.connection-title {
+  font-family: var(--font-script);
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: var(--accent-copper-light);
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
+.connection-quote {
   position: relative;
   padding: var(--space-xl);
   background: linear-gradient(135deg, var(--bg-card) 0%, var(--accent-blue) 100%);
   border-radius: 16px;
   border: 1px solid rgba(199, 125, 74, 0.2);
-  text-align: center;
-  overflow: hidden;
+  margin-bottom: var(--space-xl);
 }
 
-.why-collect-content::before {
+.connection-quote::before {
   content: '"';
   position: absolute;
-  top: -20px;
-  left: 30px;
+  top: -10px;
+  left: 20px;
   font-family: var(--font-display);
-  font-size: 10rem;
+  font-size: 8rem;
   color: var(--accent-copper);
-  opacity: 0.1;
+  opacity: 0.15;
   line-height: 1;
   pointer-events: none;
 }
 
-.why-collect-title {
-  font-family: var(--font-script);
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  color: var(--accent-copper-light);
-  margin-bottom: var(--space-md);
-  font-weight: 500;
-}
-
-.why-collect-text {
+.quote-text {
   font-family: var(--font-body);
-  font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
   color: var(--text-primary);
-  line-height: 1.8;
+  line-height: 1.9;
   font-style: italic;
   margin-bottom: var(--space-md);
+  position: relative;
+  z-index: 1;
 }
 
-.why-collect-signature {
+.quote-text:last-child {
+  margin-bottom: 0;
+}
+
+/* Meaningful Moments Grid */
+.meaningful-moments {
+  margin-bottom: var(--space-xl);
+}
+
+.moments-title {
   font-family: var(--font-script);
   font-size: 1.5rem;
   color: var(--accent-copper);
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
+.moments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-md);
+}
+
+.moment-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(199, 125, 74, 0.15);
+  border-radius: 12px;
+  padding: var(--space-lg);
+  text-align: center;
+  transition: all var(--transition-smooth);
+  cursor: default;
+}
+
+.moment-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-copper);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.moment-icon {
   display: block;
+  font-size: 2.5rem;
+  margin-bottom: var(--space-sm);
+}
+
+.moment-place {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.moment-why {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* Connection Footer */
+.connection-footer {
+  text-align: center;
+  padding-top: var(--space-lg);
+  border-top: 1px solid rgba(199, 125, 74, 0.2);
+}
+
+.connection-philosophy {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  color: var(--text-primary);
+  font-style: italic;
+  margin-bottom: var(--space-sm);
+}
+
+.connection-signature {
+  font-family: var(--font-script);
+  font-size: 1.8rem;
+  color: var(--accent-copper);
 }
 
 /* =====================================================

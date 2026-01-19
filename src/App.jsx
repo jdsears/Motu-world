@@ -645,16 +645,57 @@ function App() {
         </div>
       </header>
 
-      {/* Why I Collect Section */}
-      <section className="why-collect">
-        <div className="why-collect-content">
-          <h2 className="why-collect-title">Why I Collect</h2>
-          <p className="why-collect-text">
-            "Every moment Justin captured reminds me that we're all part of the same story.
-            These aren't just videos—they're windows into the shared human experience,
-            frozen in time yet eternally alive."
-          </p>
-          <span className="why-collect-signature">— jdsears</span>
+      {/* Personal Connection Section */}
+      <section className="personal-connection">
+        <div className="connection-content">
+          <h2 className="connection-title">On Collecting Humanity</h2>
+
+          <div className="connection-quote">
+            <p className="quote-text">
+              "In a world that moves so fast, Justin taught me to pause.
+              Each ten-second moment is a meditation on what it means to be human—
+              a stranger's laugh in Tokyo, rain falling on cobblestones in Paris,
+              the quiet reverence of a mountain at dawn.
+            </p>
+            <p className="quote-text">
+              These aren't just NFTs in my wallet. They're reminders that
+              somewhere on this spinning earth, at that exact moment,
+              life was happening. And it was beautiful."
+            </p>
+          </div>
+
+          <div className="meaningful-moments">
+            <h3 className="moments-title">Moments That Move Me</h3>
+            <div className="moments-grid">
+              <div className="moment-card">
+                <span className="moment-icon">🌸</span>
+                <span className="moment-place">Tokyo, Japan</span>
+                <span className="moment-why">Where I first fell in love with street photography</span>
+              </div>
+              <div className="moment-card">
+                <span className="moment-icon">🗼</span>
+                <span className="moment-place">Paris, France</span>
+                <span className="moment-why">The city that taught me to slow down</span>
+              </div>
+              <div className="moment-card">
+                <span className="moment-icon">🌊</span>
+                <span className="moment-place">Kauai, Hawaii</span>
+                <span className="moment-why">Nature's reminder of how small we are</span>
+              </div>
+              <div className="moment-card">
+                <span className="moment-icon">🏔️</span>
+                <span className="moment-place">Mt. Fuji, Japan</span>
+                <span className="moment-why">Sacred ground, sacred moments</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="connection-footer">
+            <p className="connection-philosophy">
+              "We are all just walking each other home."
+            </p>
+            <span className="connection-signature">— jdsears</span>
+          </div>
         </div>
       </section>
 
