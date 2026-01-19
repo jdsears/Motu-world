@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
+import GlobeView from './GlobeView';
 
 // ============================================
 // CONFIGURATION - Your wallet and contracts
@@ -399,7 +400,7 @@ const NFTModal = ({ nft, onClose, onPrev, onNext, hasPrev, hasNext }) => {
 };
 
 // Filter Component
-const FilterBar = ({ continents, activeFilter, setActiveFilter, typeFilter, setTypeFilter, totalCount, hasVideos, hasPolaroids, columns, setColumns }) => {
+const FilterBar = ({ continents, activeFilter, setActiveFilter, typeFilter, setTypeFilter, totalCount, hasVideos, hasPolaroids, columns, setColumns, viewMode, setViewMode }) => {
   const columnOptions = [5, 10, 25, 50];
 
   return (
@@ -408,21 +409,42 @@ const FilterBar = ({ continents, activeFilter, setActiveFilter, typeFilter, setT
         <span className="collection-count">{totalCount} Moments</span>
       </div>
       <div className="filter-groups">
-        {/* Column count */}
-        <div className="filter-group">
-          <span className="filter-label">Grid</span>
+        {/* View toggle */}
+        <div className="filter-group view-toggle">
+          <span className="filter-label">View</span>
           <div className="filter-buttons">
-            {columnOptions.map(num => (
-              <button
-                key={num}
-                className={`filter-btn ${columns === num ? 'active' : ''}`}
-                onClick={() => setColumns(num)}
-              >
-                {num}
-              </button>
-            ))}
+            <button
+              className={`filter-btn ${viewMode === 'gallery' ? 'active' : ''}`}
+              onClick={() => setViewMode('gallery')}
+            >
+              Gallery
+            </button>
+            <button
+              className={`filter-btn globe-btn ${viewMode === 'globe' ? 'active' : ''}`}
+              onClick={() => setViewMode('globe')}
+            >
+              <span className="globe-icon">🌍</span> Globe
+            </button>
           </div>
         </div>
+
+        {/* Column count - only show in gallery mode */}
+        {viewMode === 'gallery' && (
+          <div className="filter-group">
+            <span className="filter-label">Grid</span>
+            <div className="filter-buttons">
+              {columnOptions.map(num => (
+                <button
+                  key={num}
+                  className={`filter-btn ${columns === num ? 'active' : ''}`}
+                  onClick={() => setColumns(num)}
+                >
+                  {num}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         {/* Type filter */}
         {(hasVideos || hasPolaroids) && (
           <div className="filter-group">
@@ -487,6 +509,7 @@ function App() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all'); // 'all', 'video', 'polaroid'
   const [columns, setColumns] = useState(25); // 5, 10, 25, 50
+  const [viewMode, setViewMode] = useState('gallery'); // 'gallery' or 'globe'
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [dataSource, setDataSource] = useState('placeholder');
@@ -671,32 +694,44 @@ function App() {
         hasPolaroids={hasPolaroids}
         columns={columns}
         setColumns={setColumns}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
       />
 
-      {/* Gallery Grid */}
-      <main className="gallery">
-        {loading ? (
-          <div className="loading">
-            <div className="loading-spinner"></div>
-            <p>Loading your moments...</p>
-          </div>
-        ) : error ? (
-          <div className="error">
-            <p>{error}</p>
-          </div>
-        ) : (
-          <div className="gallery-grid" style={{ '--columns': columns }}>
-            {sortedNFTs.map((nft, index) => (
-              <NFTCard
-                key={nft.id}
-                nft={nft}
-                onClick={() => setSelectedIndex(index)}
-                index={index}
-              />
-            ))}
-          </div>
-        )}
-      </main>
+      {/* Main Content - Gallery or Globe */}
+      {viewMode === 'globe' ? (
+        <GlobeView
+          videos={nfts}
+          onSelectVideo={(video) => {
+            const index = sortedNFTs.findIndex(n => n.id === video.id);
+            if (index !== -1) setSelectedIndex(index);
+          }}
+        />
+      ) : (
+        <main className="gallery">
+          {loading ? (
+            <div className="loading">
+              <div className="loading-spinner"></div>
+              <p>Loading your moments...</p>
+            </div>
+          ) : error ? (
+            <div className="error">
+              <p>{error}</p>
+            </div>
+          ) : (
+            <div className="gallery-grid" style={{ '--columns': columns }}>
+              {sortedNFTs.map((nft, index) => (
+                <NFTCard
+                  key={nft.id}
+                  nft={nft}
+                  onClick={() => setSelectedIndex(index)}
+                  index={index}
+                />
+              ))}
+            </div>
+          )}
+        </main>
+      )}
 
       {/* Modal */}
       {selectedIndex !== null && sortedNFTs[selectedIndex] && (

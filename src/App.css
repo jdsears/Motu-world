@@ -1459,3 +1459,328 @@ body {
     gap: var(--space-md);
   }
 }
+
+/* =====================================================
+   GLOBE VIEW
+   ===================================================== */
+
+.globe-container {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 200px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.globe-container canvas {
+  cursor: grab;
+}
+
+.globe-container canvas:active {
+  cursor: grabbing;
+}
+
+/* Globe tooltip on hover */
+.globe-tooltip {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(10, 9, 8, 0.95);
+  border: 1px solid var(--accent-warm);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: 8px;
+  text-align: center;
+  pointer-events: none;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.tooltip-day {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.25rem;
+}
+
+.tooltip-date {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.tooltip-location {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Globe detail panel */
+.globe-detail-panel {
+  position: fixed;
+  top: 50%;
+  right: 40px;
+  transform: translateY(-50%);
+  width: 400px;
+  max-height: 80vh;
+  background: rgba(10, 9, 8, 0.98);
+  border: 1px solid var(--accent-warm);
+  border-radius: 12px;
+  padding: var(--space-lg);
+  z-index: 200;
+  overflow-y: auto;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: slideInRight 0.4s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+.detail-close {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  line-height: 1;
+}
+
+.detail-close:hover {
+  color: var(--text-primary);
+}
+
+.detail-header {
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid rgba(201, 168, 124, 0.2);
+}
+
+.detail-day {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: rgba(212, 175, 55, 0.15);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  margin-bottom: 0.5rem;
+}
+
+.detail-date {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--text-primary);
+  margin: 0.5rem 0 0.25rem;
+}
+
+.detail-location {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.detail-media {
+  margin-bottom: var(--space-md);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+
+.detail-media video {
+  width: 100%;
+  display: block;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+}
+
+.no-video {
+  aspect-ratio: 4/5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  color: var(--text-muted);
+}
+
+.detail-description {
+  margin-bottom: var(--space-md);
+  padding: var(--space-md);
+  background: rgba(201, 168, 124, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid var(--accent-warm);
+}
+
+.detail-description p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.detail-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.meta-item {
+  background: rgba(255, 255, 255, 0.03);
+  padding: var(--space-sm);
+  border-radius: 6px;
+  text-align: center;
+}
+
+.meta-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.25rem;
+}
+
+.meta-value {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.detail-opensea-link {
+  display: block;
+  text-align: center;
+  padding: var(--space-sm) var(--space-md);
+  background: linear-gradient(135deg, var(--accent-warm), var(--accent-gold));
+  color: var(--bg-primary);
+  text-decoration: none;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.detail-opensea-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(201, 168, 124, 0.3);
+}
+
+/* Globe stats overlay */
+.globe-stats {
+  position: absolute;
+  top: var(--space-lg);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10, 9, 8, 0.8);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: 30px;
+  border: 1px solid rgba(201, 168, 124, 0.3);
+  backdrop-filter: blur(10px);
+  z-index: 50;
+}
+
+.globe-stat {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.globe-stat-divider {
+  margin: 0 var(--space-sm);
+  color: var(--accent-warm);
+}
+
+/* Globe instructions */
+.globe-instructions {
+  position: absolute;
+  bottom: var(--space-lg);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* View toggle button styling */
+.filter-btn.globe-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.globe-icon {
+  font-size: 1rem;
+}
+
+.filter-btn.globe-btn.active {
+  background: linear-gradient(135deg, #ff3333, #cc0000);
+  border-color: #ff3333;
+}
+
+/* Mobile responsive for globe */
+@media (max-width: 768px) {
+  .globe-detail-panel {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    transform: none;
+    width: 100%;
+    max-height: 70vh;
+    border-radius: 20px 20px 0 0;
+    animation: slideInUp 0.4s ease;
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(100px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .globe-stats {
+    top: var(--space-sm);
+    padding: var(--space-xs) var(--space-md);
+  }
+
+  .globe-stat {
+    font-size: 0.75rem;
+  }
+
+  .globe-instructions {
+    display: none;
+  }
+}
