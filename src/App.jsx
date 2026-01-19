@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import GlobeView from './GlobeView';
+import TimelineView from './TimelineView';
 
 // ============================================
 // CONFIGURATION - Your wallet and contracts
@@ -420,6 +421,12 @@ const FilterBar = ({ continents, activeFilter, setActiveFilter, typeFilter, setT
               Gallery
             </button>
             <button
+              className={`filter-btn ${viewMode === 'timeline' ? 'active' : ''}`}
+              onClick={() => setViewMode('timeline')}
+            >
+              Timeline
+            </button>
+            <button
               className={`filter-btn globe-btn ${viewMode === 'globe' ? 'active' : ''}`}
               onClick={() => setViewMode('globe')}
             >
@@ -597,16 +604,14 @@ function App() {
 
   return (
     <div className="app">
-      {/* Film Borders - Sprocket holes on left & right */}
-      <div className="film-border left">
-        {[...Array(sprocketCount)].map((_, i) => (
-          <div key={`l-${i}`} className="sprocket"></div>
-        ))}
+      {/* Elegant Edge Borders */}
+      <div className="edge-border left">
+        <div className="edge-line"></div>
+        <div className="edge-glow"></div>
       </div>
-      <div className="film-border right">
-        {[...Array(sprocketCount)].map((_, i) => (
-          <div key={`r-${i}`} className="sprocket"></div>
-        ))}
+      <div className="edge-border right">
+        <div className="edge-line"></div>
+        <div className="edge-glow"></div>
       </div>
 
       {/* Atmospheric Background */}
@@ -619,26 +624,47 @@ function App() {
       {/* Header */}
       <header className="header">
         <div className="header-content">
+          {/* Monogram Logo */}
+          <div className="monogram">
+            <span className="monogram-letter">J</span>
+            <span className="monogram-letter">S</span>
+          </div>
+
           <div className="logo-section">
             <p className="artist-name">JUSTIN AVERSANO</p>
             <h1 className="title">
               <span className="title-main">Moments</span>
-              <span className="title-sub"><span className="title-muted">OF THE </span>Unknown</span>
+              <span className="title-sub"><span className="title-muted">of the </span>Unknown</span>
             </h1>
           </div>
-          <div className="artist-credit">
-            <span className="collector-tag">The jdsears Collection</span>
+
+          <div className="collector-brand">
+            <span className="collector-name">jdsears</span>
+            <span className="collector-label">Collection</span>
           </div>
         </div>
       </header>
+
+      {/* Why I Collect Section */}
+      <section className="why-collect">
+        <div className="why-collect-content">
+          <h2 className="why-collect-title">Why I Collect</h2>
+          <p className="why-collect-text">
+            "Every moment Justin captured reminds me that we're all part of the same story.
+            These aren't just videos—they're windows into the shared human experience,
+            frozen in time yet eternally alive."
+          </p>
+          <span className="why-collect-signature">— jdsears</span>
+        </div>
+      </section>
 
       {/* Collection Info */}
       <section className="collection-intro">
         <div className="intro-content">
           <p className="intro-text">
-            My collection from Justin Aversano's cinematic portrait of humanity,
+            A personal journey through Justin Aversano's cinematic portrait of humanity,
             captured over 366 days across all seven continents.
-            Each 10-second Super 8 moment is tied to a specific calendar date.
+            Each moment is a 10-second window into our shared human experience.
           </p>
           <div className="collection-stats">
             <div className="stat">
@@ -698,12 +724,20 @@ function App() {
         setViewMode={setViewMode}
       />
 
-      {/* Main Content - Gallery or Globe */}
+      {/* Main Content - Gallery, Timeline, or Globe */}
       {viewMode === 'globe' ? (
         <GlobeView
           videos={nfts}
           onSelectVideo={(video) => {
             const index = sortedNFTs.findIndex(n => n.id === video.id);
+            if (index !== -1) setSelectedIndex(index);
+          }}
+        />
+      ) : viewMode === 'timeline' ? (
+        <TimelineView
+          nfts={sortedNFTs}
+          onSelectNFT={(nft) => {
+            const index = sortedNFTs.findIndex(n => n.id === nft.id);
             if (index !== -1) setSelectedIndex(index);
           }}
         />
