@@ -653,7 +653,7 @@ function App() {
           <div className="connection-quote">
             <p className="quote-text">
               "In a world that moves so fast, Justin taught me to pause.
-              Each ten-second moment is a meditation on what it means to be human—
+              Each ten-second moment is a meditation on what it means to be human:
               a stranger's laugh in Tokyo, rain falling on cobblestones in Paris,
               the quiet reverence of a mountain at dawn.
             </p>
