@@ -694,7 +694,7 @@ function App() {
             <p className="connection-philosophy">
               "We are all just walking each other home."
             </p>
-            <span className="connection-signature">— jdsears</span>
+            <span className="connection-signature">jdsears</span>
           </div>
         </div>
       </section>
